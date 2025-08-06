@@ -1,4 +1,11 @@
-# BirdCLEF-25
+# Bird Sound Classification for BirdCLEF'25
+
+This repository contains the code and methodology developed during my remote research internship with Nanyang Technological University (NTU), Singapore. The project focuses on leveraging the HuBERT model to generate audio embeddings for bird sound classification as part of the BirdCLEF'25 challenge.
+
+![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
+
+## 📖 About The Project
+
 # Competition Context
 
 This competition is part of the ongoing efforts to enhance biodiversity monitoring in the El Silencio Natural Reserve, located in the lowlands of the Magdalena Valley of Colombia. This region is a biodiversity hotspot facing severe threats, with over 70% of its lowland rainforests replaced by pastures for cattle ranching.
@@ -57,47 +64,44 @@ These recordings do NOT overlap with the exact recording sites of the test data
 
 Can be used for semi-supervised learning approaches
 
-## 4. Taxonomy Information (taxonomy.csv):
 
-Data on the different species
 
-Includes iNaturalist taxon ID and class name (Aves, Amphibia, Mammalia, Insecta)
+## 🚀 Methodology & My Contributions
 
-Location Information (recording_location.txt):
+My work was divided into three core stages, moving from raw data to trainable embeddings.
 
-High-level information about El Silencio Natural Reserve
+### 1. Audio Data Pre-processing
 
-## 5. Test Data
-The test dataset (test_soundscapes/) consists of:
+The initial stage focused on preparing the raw audio data from the HSN (Hawaii, Sand-network) dataset for training. This involved cleaning and standardizing the audio files to ensure consistency.
 
-Approximately 700 one-minute recordings in OGG format (32 kHz)
+* **Augmentations:** Applied various augmentations to the raw audio to increase the diversity of the training data and improve model robustness.
+* **Chunking:** Processed and split the augmented audio files into uniform **30-second intervals**, which is a standard input format for many audio processing models.
 
-Filenames are randomized with the pattern soundscape_xxxxxx.ogg
+> **The code for this entire pre-processing pipeline can be found in [this file](load_unlabeled_audio.py).**
 
-These recordings are used for scoring your model's performance
+### 2. HuBERT Training Pipeline
 
-Not all species from the training data appear in the test data
+I worked on the core training pipeline responsible for fine-tuning the HuBERT model on the prepared audio data. HuBERT (Hidden-Unit BERT) is a self-supervised model that learns powerful representations of audio directly from the raw waveform, making it ideal for this task.
 
-# Submission Format
-The sample submission file (sample_submission.csv) includes:
+> **The implementation of the HuBERT training pipeline is located in [this file](Hubertpipeline.ipynb).**
 
-row_id: Identifier in the format soundscape_[soundscape_id]_[end_time]
+### 3. Embedding Generation
 
-Example: Segment 00:15-00:20 of soundscape_12345.ogg has row ID soundscape_12345_20
+Using the trained pipeline, I processed the entire HSN dataset to generate high-quality audio embeddings. These embeddings capture the complex features of the bird calls and serve as the direct input for a downstream classification model.
 
-[species_id]: 206 columns, one for each species
+* **Dataset:** HSN (Hawaii, Sand-network) from BirdCLEF'25.
+* **Output:** A set of feature vectors (embeddings) ready for training a classifier like a simple Neural Network or a more advanced EAT (Efficient Audio Transformer) model.
 
-We must predict the probability (0-1) of each species' presence in each 5-second segment
+> **The script used to generate the final embeddings is available here: [embedding_generation.py](generate_hubert_embeddings.py).**
 
-# Technical Considerations
-The audio files are sampled at 32 kHz, meaning each second of audio contains 32,000 samples
+---
 
-The test predictions are made on 5-second segments of the 1-minute test recordings
+## ✨ Key Technologies
 
-The submitted notebook must complete inference within the competition time limits
-
-GPU notebook submissions are disabled (or limited to 1 minute runtime)
-
-CPU notebooks have a maximum runtime of 90 minutes
+* Python
+* PyTorch
+* Hugging Face Transformers (for HuBERT)
+* Librosa and TorchAudio (for audio processing)
+* Pandas & NumPy
 
 This competition represents an important step in developing tools to monitor biodiversity in tropical ecosystems, with potential applications for conservation efforts worldwide.
